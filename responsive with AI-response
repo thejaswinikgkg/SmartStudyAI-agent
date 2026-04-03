@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart Study AI Agent</title>
+
+<style>
+body { font-family: Arial; margin:0; background:#eef2f7; }
+
+h1 {
+    text-align:center;
+    background: linear-gradient(45deg,#4CAF50,#2196F3);
+    color:white;
+    padding:15px;
+}
+
+.container { text-align:center; margin-top:40px; }
+
+input, textarea {
+    padding:10px;
+    margin:8px;
+    width:250px;
+}
+
+button {
+    padding:10px;
+    margin:8px;
+    background:#2196F3;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+.menu button {
+    width:200px;
+}
+
+.section { display:none; }
+
+.card {
+    background:white;
+    padding:20px;
+    margin:20px auto;
+    width:340px;
+    border-radius:10px;
+    box-shadow:0 0 10px gray;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login" class="container">
+<h1>Welcome to Smart Study AI</h1>
+<input type="text" id="name" placeholder="Enter your name"><br>
+<input type="text" id="class" placeholder="Enter your class"><br>
+<button onclick="startApp()">Start</button>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none;">
+<h1>Smart Study AI Agent</h1>
+
+<div class="menu container">
+<button onclick="showSection('plan')">Make My Plan</button>
+<button onclick="showSection('history')">History</button>
+<button onclick="showSection('future')">Future Tasks</button>
+<button onclick="showSection('resources')">Resources</button>
+</div>
+
+<!-- MAKE PLAN -->
+<div id="plan" class="section">
+<div class="card">
+<h3>Create Study Plan</h3>
+
+<div id="subjectContainer">
+<input type="text" class="subjectInput" placeholder="Enter subject"><br>
+</div>
+
+<button onclick="addSubject()">+ Add Subject</button><br>
+
+<input type="number" id="days" placeholder="Days left"><br>
+
+<button onclick="generatePlan()">Generate Plan</button>
+
+<h4>Progress Tracker</h4>
+<input type="text" id="completedTask" placeholder="Mark completed task">
+<button onclick="markComplete()">Mark Done</button>
+<p id="progressList"></p>
+
+<p id="planOutput"></p>
+
+<button onclick="clearAll()">Clear Data</button>
+</div>
+</div>
+
+<!-- HISTORY -->
+<div id="history" class="section">
+<div class="card">
+<h3>History</h3>
+<p id="historyList"></p>
+</div>
+</div>
+
+<!-- FUTURE -->
+<div id="future" class="section">
+<div class="card">
+<h3>Future Tasks</h3>
+<input type="text" id="futureTask" placeholder="Enter task"><br>
+<button onclick="addTask()">Add Task</button>
+<p id="futureList"></p>
+</div>
+</div>
+
+<!-- RESOURCES -->
+<div id="resources" class="section">
+<div class="card">
+<h3>Resources / Notes</h3>
+<textarea id="notes" placeholder="Write notes"></textarea><br>
+<button onclick="saveNotes()">Save</button>
+<p id="savedNotes"></p>
+</div>
+</div>
+
+</div>
+
+<script>
+
+let historyData = "";
+let futureData = "";
+let progressData = "";
+
+// START APP
+function startApp() {
+    let name = document.getElementById("name").value;
+    let cls = document.getElementById("class").value;
+
+    if(name=="" || cls==""){
+        alert("Please fill details");
+        return;
+    }
+
+    document.getElementById("login").style.display="none";
+    document.getElementById("app").style.display="block";
+}
+
+// NAVIGATION
+function showSection(id){
+    let sections=document.getElementsByClassName("section");
+    for(let i=0;i<sections.length;i++){
+        sections[i].style.display="none";
+    }
+    document.getElementById(id).style.display="block";
+}
+
+// ADD SUBJECT
+function addSubject(){
+    let container=document.getElementById("subjectContainer");
+    let input=document.createElement("input");
+    input.type="text";
+    input.className="subjectInput";
+    input.placeholder="Enter subject";
+    container.appendChild(input);
+    container.appendChild(document.createElement("br"));
+}
+
+// GENERATE PLAN
+function generatePlan(){
+    let subjectInputs=document.getElementsByClassName("subjectInput");
+    let days=document.getElementById("days").value;
+
+    let subjects=[];
+
+    for(let i=0;i<subjectInputs.length;i++){
+        if(subjectInputs[i].value!=""){
+            subjects.push(subjectInputs[i].value.toLowerCase());
+        }
+    }
+
+    let result="";
+    let aiTips = [
+        "Focus deeply without distractions.",
+        "Take short breaks to improve memory.",
+        "Revise before sleep for better retention.",
+        "Use active recall for strong learning."
+    ];
+
+    for(let i=0;i<days;i++){
+        if(i==days-1){
+            result += "<b>Day "+(i+1)+": Revise all subjects</b><br>";
+        }else{
+            let sub=subjects[i%subjects.length];
+
+            if(sub.includes("math")||sub.includes("dsa")||sub.includes("code")){
+                result += "Day "+(i+1)+": Practice "+sub+" (3-4 hrs)<br>";
+                result += "→ 9AM Practice | 2PM Problems | 6PM Revision<br><br>";
+            }else{
+                result += "Day "+(i+1)+": Study "+sub+" (1-2 hrs)<br>";
+                result += "→ 10AM Study | 5PM Revision<br><br>";
+            }
+
+            let tip = aiTips[Math.floor(Math.random()*aiTips.length)];
+            result += "<i>AI Tip: "+tip+"</i><br><br>";
+        }
+    }
+
+    document.getElementById("planOutput").innerHTML=result;
+
+    historyData += result + "<hr>";
+    document.getElementById("historyList").innerHTML=historyData;
+}
+
+// PROGRESS
+function markComplete(){
+    let task = document.getElementById("completedTask").value;
+
+    if(task===""){
+        alert("Enter task");
+        return;
+    }
+
+    progressData += "✔ " + task + "<br>";
+    document.getElementById("progressList").innerHTML = progressData;
+
+    historyData += "Completed: " + task + "<br>";
+    document.getElementById("historyList").innerHTML = historyData;
+}
+
+// FUTURE TASK
+function addTask(){
+    let task=document.getElementById("futureTask").value;
+
+    futureData += task + "<br>";
+    document.getElementById("futureList").innerHTML=futureData;
+
+    historyData += "Future Task: "+task+"<br>";
+    document.getElementById("historyList").innerHTML=historyData;
+}
+
+// NOTES WITH STORAGE
+function saveNotes(){
+    let notes=document.getElementById("notes").value;
+    localStorage.setItem("notes", notes);
+    document.getElementById("savedNotes").innerHTML=notes;
+}
+
+// LOAD NOTES
+window.onload = function(){
+    let saved = localStorage.getItem("notes");
+    if(saved){
+        document.getElementById("savedNotes").innerHTML = saved;
+    }
+}
+
+// CLEAR DATA
+function clearAll(){
+    document.getElementById("planOutput").innerHTML="";
+    document.getElementById("historyList").innerHTML="";
+    document.getElementById("futureList").innerHTML="";
+    document.getElementById("progressList").innerHTML="";
+    document.getElementById("savedNotes").innerHTML="";
+
+    historyData="";
+    futureData="";
+    progressData="";
+}
+
+</script>
+
+</body>
+</html>
