@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Study AI Agent</title>
+</head>
+<body>
+
+<h1>Smart Study AI Agent</h1>
+
+<label>Days:</label>
+<input type="number" id="days"><br><br>
+
+<label>Subjects:</label>
+<input type="number" id="subjects"><br><br>
+
+<button onclick="generatePlan()">Generate Plan</button>
+
+<h3>Study Plan:</h3>
+<p id="output"></p>
+
+<script>
+function generatePlan() {
+    let days = document.getElementById("days").value;
+    let subjects = document.getElementById("subjects").value;
+
+    let result = "";
+
+    for (let i = 1; i <= days; i++) {
+        if (i == days) {
+            result += "Day " + i + ": Revise all subjects<br>";
+        } else {
+            result += "Day " + i + ": Study Subject " + ((i % subjects) + 1) + "<br>";
+        }
+    }
+
+    document.getElementById("output").innerHTML = result;
+}
+</script>
+
+</body>
+</html>
